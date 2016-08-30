@@ -21,13 +21,11 @@ class trumpListener(StreamListener):
 
 	#header = "Dear Mr. Trump,"
 	footer = "Sincerely, a Dissapointed Abe Lincoln."
-	screenName = 'DisappointedAbe'
-	
-	responses = [
-	"I died for THIS?!",
-	"If I was alive today, I would shoot myself just because of you.",
-	"I remember when the GOP actually had politicans in it. Guess not anymore."
-	]
+
+	responses = ["Test."]
+
+	trump = 'realDonaldTrump'
+	test = 'DisappointedAbe'
 
 	def on_connect(self):
 		print "Internet ok."
@@ -35,25 +33,26 @@ class trumpListener(StreamListener):
 	def on_data(self, raw_data):
 
 		api = API(self.auth)
-		user = api.get_user(screen_name = 'realDonaldTrump')
+		user = api.get_user(screen_name = self.test)
 		tweetID = user.id
 
-		newTweet = api.user_timeline(screen_name = 'DisappointedAbe',count=10)[0]
-		oldTweet = newTweet #storage
-		replyText = '@realDonaldTrump ' + self.responses[responseNumber] + ' ' + self.footer
+		newTweet = api.user_timeline(screen_name = self.test,count=10)[0]
+		oldTweet = api.user_timeline(screen_name = self.test,count=10)[1]
+		newTweetID = newTweet.id
+		
+		replyText = '@DisappointedAbe ' + self.responses[0] + ' ' + self.footer
 
 		#checking if tweet is longer than 140 (but shouldn't happen)
 		if len(replyText) > 140:
 			replyText = replyText[0:137] + '...'
 
-		#send on an interval.
-		api.update_status(status = replyText, in_reply_to_status_id= tweetID)
-
-		return True
+		api.update_status(status = replyText, in_reply_to_status_id= newTweetID)
+		return False
 
 
 	def on_error(self, status):
 		print status
+		return False
 
 
 if __name__ == '__main__':
